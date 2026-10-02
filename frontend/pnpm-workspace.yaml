@@ -1,0 +1,8 @@
+# pnpm build-script approvals (pnpm 11).
+# `sharp` (Next.js image optimization) and `unrs-resolver` (ESLint import resolution)
+# ship optional native binaries. Their build scripts are declined for now to keep
+# installs hermetic and deterministic; flip to `true` when image optimization or the
+# full ESLint resolver is required.
+allowBuilds:
+  sharp: false
+  unrs-resolver: false

@@ -1,0 +1,1 @@
+"""NarraX backend application package."""
