@@ -1,11 +1,19 @@
-"""Application settings loaded from environment variables and a local `.env` file."""
+"""Application settings loaded from environment variables and a local `.env` file.
+
+This is the **only** place the application reads the environment. Modules import
+`settings` (or the `get_settings()` factory) instead of touching `os.environ`, so that:
+
+- configuration is typed and validated once, at import time (NFR-21);
+- every variable is documented in `.env.example` (NFR-20);
+- secrets never appear in source control (NFR-19).
+"""
 
 from functools import lru_cache
 from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# backend/app/core/config.py -> backend/app/core -> backend/app -> backend
+# backend/app/config/settings.py -> app/config -> app -> backend
 BACKEND_DIR = Path(__file__).resolve().parents[2]
 
 
@@ -26,11 +34,12 @@ class Settings(BaseSettings):
     # Database
     database_url: str = "postgresql+psycopg://narrax:narrax_dev_password@localhost:5432/narrax"
 
-    # LLM (provider-independent; populated in the narrative-extraction phase)
+    # LLM (provider-independent; see docs/adr/0005-provider-independent-llm.md).
+    # Empty provider/key disables the LLM-dependent pipeline stages only.
     llm_provider: str = ""
     llm_api_key: str = ""
 
-    # Reddit ingestion (Phase 1)
+    # Reddit ingestion (docs/adr/0008-reddit-only-ingestion.md)
     reddit_client_id: str = ""
     reddit_client_secret: str = ""
     reddit_user_agent: str = "narrax-dev/0.1"

@@ -1,8 +1,24 @@
-# pnpm build-script approvals (pnpm 11).
-# `sharp` (Next.js image optimization) and `unrs-resolver` (ESLint import resolution)
-# ship optional native binaries. Their build scripts are declined for now to keep
-# installs hermetic and deterministic; flip to `true` when image optimization or the
-# full ESLint resolver is required.
+# pnpm settings (pnpm 11 reads these from pnpm-workspace.yaml).
+#
+# nodeLinker: hoisted produces a flat node_modules (like npm/yarn), the most robust layout
+# for Next.js on Windows — the isolated (junction) linker can break Next's own dependency
+# resolution. See docs/adr/0011-pnpm-hoisted-node-linker.md.
+nodeLinker: hoisted
+
+# Keep the content-addressable store inside the project so installs are hermetic and do
+# not depend on a machine-global store location. (`.pnpm-store/` is gitignored.)
+storeDir: .pnpm-store
+
+# Do not implicitly re-run `pnpm install` before every `pnpm run` script. Installing is an
+# explicit, documented step (see scripts/bootstrap.* and the README), which keeps
+# `pnpm typecheck`, `pnpm lint`, and `pnpm build` fast and predictable — and avoids
+# surprise network activity during a local check.
+verifyDepsBeforeRun: false
+
+# Build-script approvals: `sharp` (Next.js image optimization) and `unrs-resolver` (ESLint
+# import resolution) ship optional native binaries. Their build scripts are declined for
+# now to keep installs hermetic and deterministic; flip to `true` when image optimization
+# or the full ESLint resolver is required.
 allowBuilds:
   sharp: false
   unrs-resolver: false

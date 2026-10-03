@@ -1,7 +1,8 @@
 """Logging configuration.
 
-Phase 0 uses a simple, explicit stdout configuration. A structured (JSON) formatter
-can be introduced later if a log-aggregation requirement appears.
+Phase 0 uses a simple, explicit stdout configuration. Structured (JSON) output, request
+correlation ids, and per-run ids are introduced when the pipeline lands (NFR-16); the
+`get_logger` entry point stays the same so call sites do not change.
 """
 
 import logging

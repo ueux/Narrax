@@ -1,14 +1,19 @@
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
+/**
+ * Domain API functions.
+ *
+ * One thin, typed function per backend endpoint, built on the shared client
+ * (`lib/api-client.ts`). Components and hooks call these, never `fetch` directly.
+ */
 
-export interface LivenessResponse {
-  status: string;
+import { apiFetch } from "@/lib/api-client";
+import type { LivenessResponse, ReadinessResponse } from "@/types/api";
+
+/** Backend liveness probe. */
+export function fetchLiveness(): Promise<LivenessResponse> {
+  return apiFetch<LivenessResponse>("/api/v1/health/live");
 }
 
-/** Fetch the backend liveness probe. */
-export async function fetchHealth(): Promise<LivenessResponse> {
-  const response = await fetch(`${API_BASE_URL}/api/v1/health/live`);
-  if (!response.ok) {
-    throw new Error(`Health check failed with status ${response.status}`);
-  }
-  return (await response.json()) as LivenessResponse;
+/** Backend readiness probe (includes a database connectivity check). */
+export function fetchReadiness(): Promise<ReadinessResponse> {
+  return apiFetch<ReadinessResponse>("/api/v1/health/ready");
 }

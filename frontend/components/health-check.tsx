@@ -1,34 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useHealth, type HealthStatus } from "@/hooks/use-health";
 
-import { fetchHealth } from "@/lib/api";
-
-type BackendStatus = "loading" | "ok" | "error";
+const STATUS_LABELS: Record<HealthStatus, string> = {
+  loading: "checking…",
+  ok: "connected",
+  error: "unreachable",
+};
 
 export default function HealthCheck() {
-  const [status, setStatus] = useState<BackendStatus>("loading");
+  const { status } = useHealth();
 
-  useEffect(() => {
-    let active = true;
-    fetchHealth()
-      .then(() => {
-        if (active) setStatus("ok");
-      })
-      .catch(() => {
-        if (active) setStatus("error");
-      });
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  return (
-    <div className="status">
-      Backend status:{" "}
-      {status === "loading" && "checking…"}
-      {status === "ok" && "connected"}
-      {status === "error" && "unreachable"}
-    </div>
-  );
+  return <div className="status">Backend status: {STATUS_LABELS[status]}</div>;
 }

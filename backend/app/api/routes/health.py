@@ -4,14 +4,11 @@
 - `/health/ready` — readiness, including a database connectivity probe.
 """
 
-from typing import Annotated
-
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, status
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
-from sqlalchemy.orm import Session
 
-from app.db.session import get_db
+from app.api.dependencies import DbSession
 from app.schemas.health import LivenessResponse
 
 router = APIRouter(tags=["health"])
@@ -24,7 +21,7 @@ def liveness() -> LivenessResponse:
 
 
 @router.get("/health/ready")
-def readiness(db: Annotated[Session, Depends(get_db)]) -> JSONResponse:
+def readiness(db: DbSession) -> JSONResponse:
     """Report readiness, probing the database."""
     try:
         db.execute(text("SELECT 1"))

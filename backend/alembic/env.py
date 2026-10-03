@@ -9,10 +9,10 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 
 # Import models so they register onto Base.metadata for autogenerate.
-import app.models  # noqa: F401
+import app.database.models  # noqa: F401
 from alembic import context
-from app.core.config import settings
-from app.db.base import Base
+from app.config.settings import settings
+from app.database.base import Base
 
 config = context.config
 

@@ -42,6 +42,16 @@ Thumbs.db
 *.swo
 
 # === Local data / runtime artifacts ===
-data/
+# Local dataset contents are never committed, but the directory README is tracked so the
+# layout is documented. See data/README.md.
+data/*
+!data/README.md
 .tmp/
 *.log
+
+# === Experiments ===
+# Notebooks and scripts are tracked; generated outputs are not.
+experiments/outputs/
+
+# === Jupyter ===
+.ipynb_checkpoints/
