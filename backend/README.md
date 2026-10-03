@@ -57,14 +57,30 @@ pytest                            # tests (no live database required)
 
 Or run every gate at once from the repository root: `pwsh -File scripts/check.ps1`.
 
+## Database
+
+The schema (18 tables across four epistemic layers), its review findings, and the rationale for
+every index are documented in [docs/database.md](../docs/database.md).
+
+```bash
+# A real PostgreSQL + pgvector server, no Docker and no admin rights required:
+pip install -e ".[dev,db-test]"
+pytest tests/database -v
+```
+
+Alternatively set `NARRAX_TEST_DATABASE_URL` to point at any PostgreSQL with the `vector`
+extension. If neither is available the database tests skip with an explanatory message.
+
 ## Tests
 
-`tests/` mirrors `app/`. Shared fixtures live in `tests/conftest.py`; the readiness test
-overrides the database dependency with an in-memory fake, so the suite needs no services.
+`tests/` mirrors `app/`. Shared fixtures live in `tests/conftest.py` (API tests use an in-memory
+fake session, so they need no services); `tests/database/conftest.py` provisions a real
+PostgreSQL server for the constraint, cascade, and pgvector tests.
 
 ```bash
 pytest                            # all tests
 pytest tests/api                  # one boundary
+pytest tests/database             # real-database tests
 ```
 
 ## Migrations

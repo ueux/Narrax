@@ -20,7 +20,8 @@ finally evidence-grounded narratives and their evolution over time.
 | Stage | Scope | Status |
 |-------|-------|--------|
 | 0 | Repository scaffold (layout, DB, API shell) | ✅ done |
-| 0.5 | Product requirements, architecture + ADRs, repo structure, engineering foundation | ✅ current |
+| 0.5 | Product requirements, architecture + ADRs, repo structure, engineering foundation | ✅ done |
+| 0.6 | Database schema: 18 tables, migrations, indexes, database tests | ✅ current |
 | 1 | Reddit ingestion + storage (PostgreSQL + pgvector) | ⬜ planned |
 | 2 | Embeddings + semantic clustering (HDBSCAN) | ⬜ planned |
 | 3 | Sentiment + stance classification | ⬜ planned |
@@ -135,6 +136,20 @@ pwsh -File scripts/check.ps1          # Windows
 `pnpm build` runs the production build (also part of Next's type/lint check) but is excluded
 from the fast gate script. See [scripts/README.md](scripts/README.md).
 
+### Database tests
+
+The API and config tests always run. The **database tests need a real PostgreSQL + pgvector**
+server, obtained from (in order) `NARRAX_TEST_DATABASE_URL`, or a self-contained embedded server
+if the optional extra is installed:
+
+```bash
+cd backend
+pip install -e ".[dev,db-test]"   # adds pgserver: PostgreSQL + pgvector, no Docker, no admin
+pytest tests/database -v
+```
+
+With neither available those tests **skip with an explanatory message** rather than failing.
+
 ---
 
 ## Documentation
@@ -150,6 +165,7 @@ from the fast gate script. See [scripts/README.md](scripts/README.md).
 
 - [Architecture](docs/architecture.md) — system, components, flows, boundaries, deployment
 - [Data flow](docs/data-flow.md) — every stage, its inputs/outputs, idempotency, provenance
+- [Database](docs/database.md) — ERD, table reference, review findings, index rationale
 - [ADRs](docs/adr/README.md) — why the architecture is the way it is
 
 **Principles**

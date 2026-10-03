@@ -26,7 +26,6 @@ experiments/  research notebooks and evaluation scripts
 scripts/      developer/operational scripts
 data/         local data (gitignored content)
 ```
-
 **No cross-language workspace orchestrator** (no Nx/Turborepo/npm workspaces spanning
 Python). Each language keeps its native tooling: `pyproject.toml` for Python, `package.json`
 + pnpm for Node.

@@ -467,5 +467,6 @@ Each is excluded **until a measured trigger** — not because it is difficult.
 | [0011](adr/0011-pnpm-hoisted-node-linker.md) | pnpm with hoisted node linker |
 | [0012](adr/0012-alembic-migrations.md) | Alembic for all schema changes |
 | [0013](adr/0013-excluded-infrastructure.md) | Infrastructure excluded from the MVP |
+| [0014](adr/0014-operator-accounts.md) | Operator accounts (`users`) in the MVP |
 
 Index: [adr/README.md](adr/README.md)

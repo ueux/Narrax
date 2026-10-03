@@ -96,7 +96,7 @@ not when it becomes interesting.
 | X-8 | Additional ingestion platforms | Reddit-only quality proven + adapter pattern exists |
 | X-9 | Local large LLM hosting | Cost/privacy requirement measured |
 | X-10 | Microservices split | A single deployable becomes a proven bottleneck |
-| X-11 | Multi-tenancy / accounts / RBAC | External users need isolation |
+| X-11 | Multi-tenancy / authentication / RBAC | External users need isolation. A minimal **operator-identity** table exists (`users`) and is recorded in [ADR-0014](adr/0014-operator-accounts.md); it grants no access and is unrelated to collected authors. |
 | X-12 | Mobile app | Web demand proven |
 | X-13 | Model fine-tuning / custom training | Off-the-shelf accuracy proven insufficient |
 | X-14 | Scheduled reports / PDF export | Stakeholder reporting demand |

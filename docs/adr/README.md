@@ -36,3 +36,4 @@ Revisit trigger**. Status is one of `Proposed`, `Accepted`, `Superseded by ADR-X
 | [0011](0011-pnpm-hoisted-node-linker.md) | pnpm with hoisted node linker | Accepted |
 | [0012](0012-alembic-migrations.md) | Alembic for all schema changes | Accepted |
 | [0013](0013-excluded-infrastructure.md) | Infrastructure excluded from the MVP | Accepted |
+| [0014](0014-operator-accounts.md) | Operator accounts (`users`) in the MVP | Accepted |

@@ -34,12 +34,20 @@ virtualenv or `backend/.env`.
 | Backend lint | `ruff check .` | unused imports, bugs, style |
 | Backend format | `ruff format --check .` | formatting drift |
 | Backend types | `mypy app` | type errors in application code |
-| Backend tests | `pytest` | regressions (no live database required) |
+| Backend tests | `pytest` | regressions |
 | Frontend types | `pnpm typecheck` (`tsc --noEmit`) | API contract drift, type errors |
 | Frontend lint | `pnpm lint` (`eslint .`) | React/Next rule violations |
 
 `pnpm build` is intentionally **not** in `check.ps1`/`check.sh` — it is slow, so it belongs
 in CI and in release preparation rather than the inner loop.
+
+### About the database tests
+
+`pytest` runs the API and config tests anywhere. The `tests/database/` suite needs a real
+PostgreSQL + pgvector server and is provisioned from, in order:
+`NARRAX_TEST_DATABASE_URL`, then `pgserver` (installed by the `db-test` extra that
+`bootstrap` installs), otherwise it **skips** with an explanatory message. A skip means the
+constraint and cascade tests did not run — check the summary line if that matters.
 
 ## Equivalent raw commands
 

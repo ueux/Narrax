@@ -66,9 +66,11 @@ try {
     if (-not (Test-Path $python)) { $python = Join-Path $backend '.venv/bin/python' }
     if (-not (Test-Path $python)) { throw 'Could not locate the virtualenv interpreter.' }
 
-    Write-Step 'Backend: installing dependencies (editable + dev extras)'
+    Write-Step 'Backend: installing dependencies (editable + dev + db-test extras)'
     Invoke-Checked 'pip upgrade' $python @('-m', 'pip', 'install', '--upgrade', 'pip')
-    Invoke-Checked 'pip install -e .[dev]' $python @('-m', 'pip', 'install', '-e', '.[dev]')
+    Invoke-Checked 'pip install -e .[dev,db-test]' $python @(
+        '-m', 'pip', 'install', '-e', '.[dev,db-test]'
+    )
 
     if (-not (Test-Path '.env')) {
         Copy-Item (Join-Path $root '.env.example') '.env'

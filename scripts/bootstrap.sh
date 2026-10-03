@@ -26,9 +26,9 @@ cd "$backend"
 py="$backend/.venv/bin/python"
 [[ -x "$py" ]] || { echo "virtualenv interpreter not found" >&2; exit 1; }
 
-step 'Backend: installing dependencies (editable + dev extras)'
+step 'Backend: installing dependencies (editable + dev + db-test extras)'
 "$py" -m pip install --upgrade pip
-"$py" -m pip install -e '.[dev]'
+"$py" -m pip install -e '.[dev,db-test]'
 
 if [[ -f .env ]]; then
   echo "    backend/.env already exists - left unchanged"

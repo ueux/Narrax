@@ -27,6 +27,13 @@ dev = [
     "mypy>=1.11,<2.0",
 ]
 
+# Database integration tests spin up a real PostgreSQL + pgvector server with no admin
+# rights and no Docker. Install with: pip install -e ".[dev,db-test]"
+# When neither pgserver nor NARRAX_TEST_DATABASE_URL is available, database tests skip.
+db-test = [
+    "pgserver>=0.1.4,<1.0",
+]
+
 [tool.setuptools.packages.find]
 include = ["app*"]
 
@@ -50,6 +57,11 @@ select = ["E", "F", "I", "B", "UP", "SIM"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["app"]
+
+[tool.ruff.lint.per-file-ignores]
+# Alembic migrations are generated from the models. Long single-line SQL strings inside
+# CheckConstraint(...) cannot be wrapped without hurting readability.
+"alembic/versions/*" = ["E501"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
