@@ -77,28 +77,37 @@ Notation: **In** / **Out** / **Store** / **Idempotency** / **Layer**.
 
 ### S1 — Ingestion (Reddit → source truth)
 
-- **In:** `Topic` (subreddits, terms, window)
-- **Out:** `IngestionRun` + `Discussion` + `Comment` rows
-- **Store:** `ingestion_runs`, `discussions`, `comments`, `source_item_refs`
-- **Transformations:** pagination → dedupe by source id → normalise field names/time →
-  attach provenance (`retrieved_at`, permalink, author handle)
-- **Idempotency:** natural key `(source, source_id)` upsert; re-fetch updates only
-  retrieval metadata, never authored content
+- **In:** `Topic` (communities, terms, window)
+- **Out:** `AnalysisRun` + `RunStage` + `Discussion` rows (posts and comments in one table)
+- **Store:** `sources`, `communities`, `authors`, `discussions`, `analysis_runs`, `run_stages`
+- **Transformations:** pagination → normalise to the platform-neutral model (identity, timestamps,
+  URLs, deleted/removed state) → dedupe by source id → attach provenance (`collected_at`,
+  permalink, pseudonymous handle)
+- **Idempotency:** natural key `(source_id, external_id)` upsert; re-fetch updates only
+  NarraX-owned retrieval metadata, never authored content
 - **Failure:** auth/rate → terminal stage error; single malformed item → skipped + counted
 - **Layer:** **1**
 
-> **Immutability:** the *authored* fields (title, body, created_at, author handle) are
+> **Immutability:** the *authored* fields (title, body, `source_created_at`, author handle) are
 > write-once. Only NarraX-owned retrieval metadata may be updated.
+>
+> Implementation: [ingestion.md](ingestion.md) §3–§4, §8.
 
 ### S2 — Normalisation & filtering
 
 - **In:** Layer-1 rows
-- **Out:** kept set + `exclusion` records (item, reason)
-- **Store:** `exclusions` (reason, stage, run)
-- **Rules (examples):** empty/whitespace body, deleted/removed marker, non-English
-  (language detection), below min length, duplicate text within topic
-- **Idempotency:** deterministic per item; same input → same decision
-- **Layer:** 1 meta (decisions about source items, not interpretations)
+- **Out:** kept set + a `text_preparation` record per item (cleaned text, usable decision, reason)
+- **Store:** `text_preparation` (keyed by `(discussion_id, pipeline_version)`)
+- **Rules:** missing/deleted/removed/empty content, below minimum length, excessive noise,
+  repetition, link-dominated, duplicate text within the corpus, non-English (language detection),
+  low information — a closed vocabulary, recorded per item
+- **Idempotency:** deterministic per item; same text + same rules → same decision and the same
+  reason. The rules' fingerprint is the `pipeline_version`, so changing a threshold writes new
+  records rather than redefining old ones
+- **Layer:** **2** (a derived observation about the text, not source truth)
+
+> **Nothing is dropped silently.** Corpus size is always explainable: "26 prepared, 12 usable,
+> 14 excluded" plus a reason breakdown ([ADR-0015](adr/0015-versioned-text-preparation.md)).
 
 ### S3 — Embedding
 
@@ -230,16 +239,20 @@ GET /api/v1/topics/{id}/narratives
 
 ## 5. Layer → storage → consumers
 
-| Layer | Representative tables | Written by | Read by |
+| Layer | Tables | Written by | Read by |
 |---|---|---|---|
-| **1 · Source truth** | `topics`, `ingestion_runs`, `discussions`, `comments`, `source_item_refs` | ingestion only | intelligence, services, API |
-| **1 meta** | `exclusions` | ingestion/filtering | services, reporting |
-| **2 · ML observations** | `embeddings`, `cluster_runs`, `clusters`, `cluster_memberships`, `sentiment_scores`, `stance_labels` | intelligence | intelligence (later stages), services, API |
-| **3 · AI interpretations** | `narratives`, `narrative_evidence`, `narrative_provenance`, `narrative_relations` | intelligence (LLM stages) | services, API |
-| **4 · Temporal** | `snapshots`, `narrative_trends`, `emerging_narratives` | intelligence (evolution) | services, API |
-| **Run metadata** | `pipeline_runs`, `stage_executions`, `model_records` | services/intelligence | API, reporting |
+| **0 · Operator** | `users` | operators | services, API |
+| **1 · Source truth** | `topics`, `topic_communities`, `sources`, `communities`, `authors`, `discussions` | ingestion only | intelligence, services, API |
+| **2 · ML observations** | `text_preparation`, `discussion_analysis`, `embeddings`, `clusters`, `cluster_members` | ingestion (preparation) and intelligence (the rest) | intelligence (later stages), services, API |
+| **3 · AI interpretations** | `narratives`, `narrative_members`, `narrative_evidence`, `narrative_relations` | intelligence (LLM stages) | services, API |
+| **4 · Temporal** | `narrative_snapshots` | intelligence (evolution) | services, API |
+| **Run metadata** | `analysis_runs`, `run_stages` | services | API, reporting |
 
-Detailed column design belongs to the implementation phase; this mapping is the contract.
+`text_preparation` is the one Layer 2 table written by ingestion, because the cleaning decision is
+part of acquiring an analysable corpus. It is still Layer 2: it is derived from source text, and it
+is never presented as source truth.
+
+Column-level design is in [database.md](database.md).
 
 ---
 

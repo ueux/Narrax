@@ -1,0 +1,62 @@
+[
+  {
+    "kind": "Listing",
+    "data": {
+      "after": null,
+      "children": [
+        {
+          "kind": "t3",
+          "data": {
+            "id": "d4e5f6",
+            "name": "t3_d4e5f6",
+            "subreddit": "technology",
+            "title": "This bill will kill open-source AI and nobody in the Senate understands why",
+            "author": "opensource_advocate",
+            "created_utc": 1706779800,
+            "permalink": "/r/technology/comments/d4e5f6/this_bill_will_kill_opensource_ai/"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "kind": "Listing",
+    "data": {
+      "after": null,
+      "children": [
+        {
+          "kind": "t1",
+          "data": {
+            "id": "e001",
+            "name": "t1_e001",
+            "subreddit": "technology",
+            "parent_id": "t3_d4e5f6",
+            "link_id": "t3_d4e5f6",
+            "body": "The compliance cost argument ignores that the threshold is deliberately set well above what any volunteer project can reach, so the comparison is misleading at best.",
+            "author": "measured_take",
+            "created_utc": 1706783400,
+            "permalink": "/r/technology/comments/d4e5f6/x/e001/",
+            "score": 210,
+            "replies": ""
+          }
+        },
+        {
+          "kind": "t1",
+          "data": {
+            "id": "e002",
+            "name": "t1_e002",
+            "subreddit": "technology",
+            "parent_id": "t3_d4e5f6",
+            "link_id": "t3_d4e5f6",
+            "body": "The audit requirement only applies above the compute threshold, which is set high enough that volunteer projects are unaffected. People are arguing against a rule that does not exist.",
+            "author": "crosspost_quoter",
+            "created_utc": 1706787000,
+            "permalink": "/r/technology/comments/d4e5f6/x/e002/",
+            "score": 33,
+            "replies": ""
+          }
+        }
+      ]
+    }
+  }
+]

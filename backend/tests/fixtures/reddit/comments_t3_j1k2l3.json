@@ -1,0 +1,62 @@
+[
+  {
+    "kind": "Listing",
+    "data": {
+      "after": null,
+      "children": [
+        {
+          "kind": "t3",
+          "data": {
+            "id": "j1k2l3",
+            "name": "t3_j1k2l3",
+            "subreddit": "programming",
+            "title": "Thoughts on the compliance burden for small teams",
+            "author": "berlin_dev",
+            "created_utc": 1709363700,
+            "permalink": "/r/programming/comments/j1k2l3/thoughts_on_compliance_burden/"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "kind": "Listing",
+    "data": {
+      "after": null,
+      "children": [
+        {
+          "kind": "t1",
+          "data": {
+            "id": "k001",
+            "name": "t1_k001",
+            "subreddit": "programming",
+            "parent_id": "t3_j1k2l3",
+            "link_id": "t3_j1k2l3",
+            "body": "Ich glaube nicht, dass kleine Teams diese Anforderung überhaupt erfüllen können, weil die Kosten für die Prüfung höher sind als das gesamte Budget des Projekts.",
+            "author": "muenchen_entwickler",
+            "created_utc": 1709367300,
+            "permalink": "/r/programming/comments/j1k2l3/x/k001/",
+            "score": 64,
+            "replies": ""
+          }
+        },
+        {
+          "kind": "t1",
+          "data": {
+            "id": "k002",
+            "name": "t1_k002",
+            "subreddit": "programming",
+            "parent_id": "t3_j1k2l3",
+            "link_id": "t3_j1k2l3",
+            "body": "Das stimmt, aber die Regel gilt erst ab einer sehr hohen Rechenleistung, die kein kleines Team erreicht. Die Diskussion ist ein wenig hysterisch.",
+            "author": "wien_coder",
+            "created_utc": 1709370900,
+            "permalink": "/r/programming/comments/j1k2l3/x/k002/",
+            "score": 28,
+            "replies": ""
+          }
+        }
+      ]
+    }
+  }
+]

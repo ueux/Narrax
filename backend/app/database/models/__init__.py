@@ -31,6 +31,7 @@ from app.database.models.observation import (
     DiscussionAnalysis,
     Embedding,
 )
+from app.database.models.preparation import TextPreparation
 from app.database.models.run import AnalysisRun, RunStage
 from app.database.models.source import Author, Community, Discussion, Source
 from app.database.models.temporal import NarrativeSnapshot
@@ -51,6 +52,7 @@ __all__ = [
     "RunStage",
     # Layer 2 — ML observations
     "DiscussionAnalysis",
+    "TextPreparation",
     "Embedding",
     "Cluster",
     "ClusterMember",

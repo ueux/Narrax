@@ -16,9 +16,10 @@ Related: [architecture.md](architecture.md) · [data-flow.md](data-flow.md) ·
 
 ## 1. Scope
 
-18 tables: the 16 specified for the MVP plus two additions that are justified in §6.3 and
-§6.4 (`topic_communities`, `run_stages`). Nothing else was added — evaluation reports, model
-registries, and trend tables were deliberately **not** created (see §7.3).
+19 tables: the 16 specified for the MVP plus three additions, each justified in §6
+(`topic_communities`, `run_stages`, and — added with the ingestion phase — `text_preparation`).
+Nothing else was added — evaluation reports, model registries, and trend tables were deliberately
+**not** created (see §7.3).
 
 | | |
 |---|---|
@@ -53,6 +54,7 @@ erDiagram
     analysis_runs ||--o{ run_stages : "records"
     analysis_runs ||--o{ discussion_analysis : "analyses"
     discussions ||--o{ discussion_analysis : "analysed in"
+    discussions ||--o{ text_preparation : "prepared as"
 
     discussions ||--o{ embeddings : "embedded as"
     analysis_runs ||--o{ embeddings : "first computed by"
@@ -84,7 +86,8 @@ Layer 1  SOURCE TRUTH           sources ─┬─ communities        (a subreddi
                                          └─ discussions ── parent/child (posts + replies)
                 selection metadata      topics ── topic_communities
 
-Layer 2  ML OBSERVATIONS        discussion_analysis   (per run: corpus + sentiment + stance)
+Layer 2  ML OBSERVATIONS        text_preparation      (per discussion, per cleaning version)
+                                discussion_analysis   (per run: corpus + sentiment + stance)
                                 embeddings            (versioned, per model)
                                 clusters ── cluster_members  (group + explicit noise)
 
@@ -154,10 +157,19 @@ other, and no query joins them — that separation is the point
 
 | Table | Purpose | Notable constraints |
 |---|---|---|
-| `discussion_analysis` | A discussion's record **within one run** — also the run's corpus membership. Holds language, sentiment, stance. | unique `(analysis_run_id, discussion_id)`; label vocabularies; sentiment ∈ [-1,1]; stance confidence ∈ [0,1] |
+| `text_preparation` | The cleaned text, the usable/excluded **decision with its reason**, and the content hash — per discussion, per cleaning version. | unique `(discussion_id, pipeline_version)`; `exclusion_reason` vocabulary CHECK; `is_usable` must agree with `exclusion_reason`; non-negative counts; confidence ∈ [0,1]; index on `content_hash` |
+| `discussion_analysis` | A discussion's record **within one run** — also the run's corpus membership. Holds sentiment and stance. | unique `(analysis_run_id, discussion_id)`; label vocabularies; sentiment ∈ [-1,1]; stance confidence ∈ [0,1] |
 | `embeddings` | One vector per `(discussion, model, model_version)`. Not run-scoped. | unique `(discussion_id, model_name, model_version)`; `dimensions = 384`; `vector(384)` |
 | `clusters` | An opinion group produced by one run. | unique `(analysis_run_id, cluster_key)`; unique `(id, analysis_run_id)` — enables the composite FKs |
 | `cluster_members` | A discussion's assignment within a run, **including explicit noise**. | unique `(analysis_run_id, discussion_id)`; composite FK to `clusters (id, analysis_run_id)`; `(cluster_id IS NULL) = is_noise` |
+
+**Preparation is not run-scoped, and analysis is.** Cleaning is a deterministic function of the text
+plus a rule set, so it belongs to the discussion and is keyed by a `pipeline_version` fingerprint of
+those rules; sentiment and stance are model outputs *for a run* and belong there. Mixing them would
+let two runs disagree about the same text ([ADR-0015](adr/0015-versioned-text-preparation.md)).
+
+**Language lives on `text_preparation`, not `discussion_analysis`.** It is a property of the text,
+computed once.
 
 **Noise is not a cluster.** `is_noise = true` with a NULL `cluster_id` means "density-based
 clustering declined to group this item". Modelling noise as a synthetic cluster would make
@@ -255,7 +267,20 @@ completed and what they produced. Stored as JSONB on `analysis_runs`, that would
 `(run, stage)` uniqueness that makes "has this stage already run?" safe to answer. A table gives
 it a constraint instead of a convention.
 
-### 6.5 JSONB — only three uses
+### 6.5 `text_preparation` (added table)
+
+Cleaning has to answer, for every collected item, "is this usable, and if not, why not?" — and that
+answer has to be recorded, because FR-2.6 requires corpus size to be explainable and never to shrink
+silently.
+
+It could have lived on `discussion_analysis`, but that table is scoped to a run while cleaning is a
+deterministic function of the text plus a rule set. Storing it per run would duplicate identical
+rows across runs and let two runs disagree about the same text. A separate record keyed by
+`(discussion_id, pipeline_version)` computes it once and lets everything downstream read one
+canonical form. It also keeps the cleaned text visibly **derived**, rather than blurring Layer 1 and
+Layer 2. Full reasoning: [ADR-0015](adr/0015-versioned-text-preparation.md).
+
+### 6.6 JSONB — only three uses
 
 `JSONB` earns its place only where the shape is genuinely open:
 
@@ -268,14 +293,14 @@ it a constraint instead of a convention.
 Everything else is a typed column. In particular, **sentiment and stance are not JSONB**: they
 are fixed, comparable, and constrained — exactly what a column plus a CHECK is for.
 
-### 6.6 Controlled vocabularies as `text` + `CHECK`
+### 6.7 Controlled vocabularies as `text` + `CHECK`
 
 Values live in `app/database/models/enums.py` as `StrEnum`s, and the CHECK is generated from the
 same definition that the application imports, so database and code cannot drift. Native
 PostgreSQL enums were rejected: adding a value requires `ALTER TYPE`, which cannot be reordered
 or easily reversed, whereas a CHECK is replaced by dropping and re-adding one constraint.
 
-### 6.7 Soft-delete: none
+### 6.8 Soft-delete: none
 
 Facts are removed by cascading from their owner (a run, a topic, a narrative), not by
 `deleted_at` flags. Nothing in the current read path needs to show "deleted" rows, and every
@@ -341,9 +366,10 @@ The schema is in third normal form with three deliberate, documented exceptions:
 
 ## 8. Index rationale
 
-**11 indexes** were added (`0003_performance_indexes.py`). PostgreSQL does **not** index foreign
-keys automatically, so several of these exist to stop a delete from scanning a whole table —
-that is a correctness-of-performance issue, not speculative tuning.
+**12 indexes** were added across `0003_performance_indexes.py` (11) and
+`0004_text_preparation.py` (1). PostgreSQL does **not** index foreign keys automatically, so several
+of these exist to stop a delete from scanning a whole table — that is a
+correctness-of-performance issue, not speculative tuning.
 
 ### 8.1 Created indexes
 
@@ -354,6 +380,7 @@ that is a correctness-of-performance issue, not speculative tuning.
 | `ix_discussions_source_created_at` | `source_created_at` | Chronological listing; the run-window filter (`BETWEEN`) every run applies |
 | `ix_discussions_parent_discussion_id` | `parent_discussion_id` | Thread reconstruction (a post's replies); self-FK delete cascade |
 | `ix_discussion_analysis_discussion_id` | `discussion_id` | A discussion's analyses across runs; discussion-delete cascade |
+| `ix_text_preparation_content_hash` | `content_hash` | Duplicate detection: "has this text already been prepared?" is asked once per collected item, and a scan would make ingestion quadratic |
 | `ix_cluster_members_cluster_id` | `cluster_id` | Cluster detail view (the members of a group); cluster-delete cascade |
 | `ix_cluster_members_discussion_id` | `discussion_id` | Which groups a discussion belongs to; discussion-delete cascade |
 | `ix_narrative_members_discussion_id` | `discussion_id` | Which narratives a discussion supports; discussion-delete cascade |
@@ -369,6 +396,7 @@ the filter. Adding a duplicate index would cost write throughput for nothing:
 | Query pattern | Served by | Leading column |
 |---|---|---|
 | Discussions for an analysis run | `uq_discussion_analysis_run_discussion` | `analysis_run_id` |
+| Preparation for a discussion | `uq_text_preparation_discussion_version` | `discussion_id` |
 | Discussions by source | `uq_discussions_source_external` | `source_id` |
 | Clusters for an analysis run | `uq_clusters_run_key` | `analysis_run_id` |
 | Members of a cluster (by run) | `uq_cluster_members_run_discussion` | `analysis_run_id` |
@@ -431,11 +459,12 @@ the source truth it was derived from.**
 | `0001_enable_pgvector` | `CREATE EXTENSION IF NOT EXISTS vector` |
 | `0002_core_schema` | All 18 tables, constraints, and composite foreign keys |
 | `0003_performance_indexes` | The 11 indexes in §8.1 |
+| `0004_text_preparation` | Adds `text_preparation` (Layer 2) and its `content_hash` index; **drops** `discussion_analysis.language`, which moves to the new table |
 
 Migrations are the only mechanism that changes the schema
-([ADR-0012](adr/0012-alembic-migrations.md)). `0002` was produced by Alembic autogenerate from
-the models and then hand-adjusted (explicit `pgvector` type import, house revision id), so the
-models and the migrations cannot drift — a property the test suite verifies by running
+([ADR-0012](adr/0012-alembic-migrations.md)). `0002` and `0004` were produced by Alembic
+autogenerate from the models and then hand-adjusted (explicit `pgvector` type import, house revision
+id), so the models and the migrations cannot drift — a property the test suite verifies by running
 `alembic check` semantics at build time.
 
 ```bash
@@ -462,6 +491,14 @@ topic and run creation, stage records, analysis records, embeddings (including a
 similarity query and pgvector's dimension enforcement), clusters, cluster membership and the
 same-run composite foreign key, narratives and the generated `claim_hash`, evidence, relations,
 snapshots, every cascade, and the index contract itself.
+
+The ingestion phase adds `test_collection.py` and `test_inspection.py` on the same harness: upsert
+idempotency (a second run inserts nothing and rewrites no authored text), comment threading through
+the self-referencing foreign key, a comment whose parent was never collected keeping a NULL parent,
+the `text_preparation` CHECKs, run and stage accounting, and the dataset report's counts,
+distributions and read-only behaviour. `test_collection.py` also asserts that the committed fixture
+corpus exercises **every** value in the exclusion vocabulary — a vocabulary that nothing produces is
+a vocabulary that will rot.
 
 ```bash
 cd backend

@@ -268,11 +268,11 @@ and only `ingestion/` writes Layer 1.
 
 ```text
 api/ ─────────▶ services/ ─────────▶ intelligence/ ──┐
-  │                  │                  │            │
-  │                  ├──────────────▶ ingestion/ ────┤
-  │                  │                  │            │
-  └──────────────────┴──────────────────┴────────────┴──▶ database/
-                                  schemas/ ◀── (api, services)
+cli/ ─────────▶     │                  │            │
+  │                 ├──────────────▶ ingestion/ ────┤
+  │                 │                  │            │
+  └─────────────────┴──────────────────┴────────────┴──▶ database/
+                                  schemas/ ◀── (api, cli, services)
                                   config/  ◀── (everyone)
 ```
 
@@ -281,24 +281,27 @@ Rules, enforced by convention and review (a lint rule can be added later):
 1. `config/` and `schemas/` are leaves — they import no sibling package.
 2. `database/` imports only `config/`.
 3. `ingestion/` and `intelligence/` import `database/`, `schemas/`, `config/` — **never**
-   `services/` or `api/`.
+   `services/`, `api/`, or `cli/`.
 4. `services/` is the only package allowed to compose ingestion + intelligence + database.
-5. `api/` imports `services/`, `schemas/`, `database/` (DI only), `config/`.
-6. **Nothing imports `api/`.** A cycle into `api/` is a design error.
+5. `api/` and `cli/` are presentation edges: they parse input, call a service, and render a result.
+   They import `services/`, `schemas/`, `database/` (DI only), `config/`.
+6. **Nothing imports `api/` or `cli/`.** A cycle into either is a design error.
 7. Cross-cutting concerns (logging, settings) come from `config/` — never re-implemented.
+8. A platform's field names never escape `ingestion/<platform>/`; everything above it works with the
+   normalized model ([ingestion.md §4](ingestion.md#4-the-normalized-model-prompt-14)).
 
 ### 7.2 Boundary → conceptual hierarchy → phase
 
 | Package | Hierarchy level | Introduced |
 |---|---|---|
 | `database/models/` | all | Phase 1 |
-| `ingestion/` | Discussion (+ Topic) | Phase 1 |
+| `ingestion/` | Discussion (+ Topic), and text preparation | Phase 1 |
 | `intelligence/` (embed/cluster) | Semantic Representation → Opinion Group | Phase 2 |
 | `intelligence/` (sentiment/stance) | Stance + Sentiment | Phase 3 |
 | `intelligence/` (narratives/llm) | Narrative → Evidence → Relations | Phase 4–5 |
 | `intelligence/` (evolution) | Temporal Evolution | Phase 6 |
 | `services/` | orchestration across levels | Phase 1+ |
-| `api/`, `schemas/` | access surfaces | Phase 1+ |
+| `api/`, `cli/`, `schemas/` | access surfaces | Phase 1+ |
 | `frontend/` | access surfaces | Phase 7 |
 
 ---
@@ -468,5 +471,6 @@ Each is excluded **until a measured trigger** — not because it is difficult.
 | [0012](adr/0012-alembic-migrations.md) | Alembic for all schema changes |
 | [0013](adr/0013-excluded-infrastructure.md) | Infrastructure excluded from the MVP |
 | [0014](adr/0014-operator-accounts.md) | Operator accounts (`users`) in the MVP |
+| [0015](adr/0015-versioned-text-preparation.md) | Versioned text preparation as a Layer 2 record |
 
 Index: [adr/README.md](adr/README.md)

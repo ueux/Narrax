@@ -27,7 +27,9 @@ def test_analysis_record_creation(session: Session) -> None:
     analysis = f.make_analysis(session, run, discussion)
 
     assert analysis.id is not None
-    assert analysis.language is None
+    # Language is not stored here: it belongs to `text_preparation`, being a property of the text
+    # rather than of a run.
+    assert not hasattr(analysis, "language")
     assert analysis.sentiment_label is None
 
 

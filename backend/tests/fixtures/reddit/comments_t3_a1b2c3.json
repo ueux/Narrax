@@ -1,0 +1,302 @@
+[
+  {
+    "kind": "Listing",
+    "data": {
+      "after": null,
+      "children": [
+        {
+          "kind": "t3",
+          "data": {
+            "id": "a1b2c3",
+            "name": "t3_a1b2c3",
+            "subreddit": "technology",
+            "title": "New AI regulation bill would require independent model audits",
+            "author": "policy_watcher",
+            "created_utc": 1705320000,
+            "permalink": "/r/technology/comments/a1b2c3/new_ai_regulation_bill_would_require_independent/"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "kind": "Listing",
+    "data": {
+      "after": null,
+      "children": [
+        {
+          "kind": "t1",
+          "data": {
+            "id": "c001",
+            "name": "t1_c001",
+            "subreddit": "technology",
+            "parent_id": "t3_a1b2c3",
+            "link_id": "t3_a1b2c3",
+            "body": "The audit requirement only applies above the compute threshold, which is set high enough that volunteer projects are unaffected. People are arguing against a rule that does not exist.",
+            "author": "skeptical_dev",
+            "created_utc": 1705323600,
+            "permalink": "/r/technology/comments/a1b2c3/x/c001/",
+            "score": 320,
+            "is_submitter": false,
+            "controversiality": 0,
+            "replies": {
+              "kind": "Listing",
+              "data": {
+                "children": [
+                  {
+                    "kind": "t1",
+                    "data": {
+                      "id": "c002",
+                      "name": "t1_c002",
+                      "subreddit": "technology",
+                      "parent_id": "t1_c001",
+                      "link_id": "t3_a1b2c3",
+                      "body": "That threshold is exactly the problem. It will be lowered within two years, and by then the compliance infrastructure will only exist inside the big labs.",
+                      "author": "small_lab_engineer",
+                      "created_utc": 1705327200,
+                      "permalink": "/r/technology/comments/a1b2c3/x/c002/",
+                      "score": 145,
+                      "controversiality": 0,
+                      "replies": {
+                        "kind": "Listing",
+                        "data": {
+                          "children": [
+                            {
+                              "kind": "t1",
+                              "data": {
+                                "id": "c003",
+                                "name": "t1_c003",
+                                "subreddit": "technology",
+                                "parent_id": "t1_c002",
+                                "link_id": "t3_a1b2c3",
+                                "body": "Amending a numeric threshold is far easier than building an audit industry from nothing, so starting somewhere is not unreasonable.",
+                                "author": "policy_watcher",
+                                "created_utc": 1705330800,
+                                "permalink": "/r/technology/comments/a1b2c3/x/c003/",
+                                "score": 96,
+                                "is_submitter": true,
+                                "controversiality": 0,
+                                "replies": ""
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "kind": "t1",
+          "data": {
+            "id": "c004",
+            "name": "t1_c004",
+            "subreddit": "technology",
+            "parent_id": "t3_a1b2c3",
+            "link_id": "t3_a1b2c3",
+            "body": "[deleted]",
+            "author": "[deleted]",
+            "created_utc": 1705334400,
+            "permalink": "/r/technology/comments/a1b2c3/x/c004/",
+            "score": 12,
+            "replies": ""
+          }
+        },
+        {
+          "kind": "t1",
+          "data": {
+            "id": "c005",
+            "name": "t1_c005",
+            "subreddit": "technology",
+            "parent_id": "t3_a1b2c3",
+            "link_id": "t3_a1b2c3",
+            "body": "[removed]",
+            "author": "angry_poster",
+            "created_utc": 1705338000,
+            "permalink": "/r/technology/comments/a1b2c3/x/c005/",
+            "score": 3,
+            "replies": ""
+          }
+        },
+        {
+          "kind": "t1",
+          "data": {
+            "id": "c006",
+            "name": "t1_c006",
+            "subreddit": "technology",
+            "parent_id": "t3_a1b2c3",
+            "link_id": "t3_a1b2c3",
+            "body": "The audit requirement only applies above the compute threshold, which is set high enough that volunteer projects are unaffected. People are arguing against a rule that does not exist.",
+            "author": "repost_account",
+            "created_utc": 1705341600,
+            "permalink": "/r/technology/comments/a1b2c3/x/c006/",
+            "score": 4,
+            "replies": ""
+          }
+        },
+        {
+          "kind": "t1",
+          "data": {
+            "id": "c007",
+            "name": "t1_c007",
+            "subreddit": "technology",
+            "parent_id": "t3_a1b2c3",
+            "link_id": "t3_a1b2c3",
+            "body": "",
+            "author": "empty_poster",
+            "created_utc": 1705345200,
+            "permalink": "/r/technology/comments/a1b2c3/x/c007/",
+            "score": 1,
+            "replies": ""
+          }
+        },
+        {
+          "kind": "t1",
+          "data": {
+            "id": "c008",
+            "name": "t1_c008",
+            "subreddit": "technology",
+            "parent_id": "t3_a1b2c3",
+            "link_id": "t3_a1b2c3",
+            "body": "Full analysis here https://example.com/some/very/long/analysis/of/the/audit/provisions/and/more",
+            "author": "link_dropper",
+            "created_utc": 1705348800,
+            "permalink": "/r/technology/comments/a1b2c3/x/c008/",
+            "score": 2,
+            "replies": ""
+          }
+        },
+        {
+          "kind": "t1",
+          "data": {
+            "id": "c009",
+            "name": "t1_c009",
+            "subreddit": "technology",
+            "parent_id": "t3_a1b2c3",
+            "link_id": "t3_a1b2c3",
+            "body": "lol lol lol lol lol lol lol lol lol",
+            "author": "lol_account",
+            "created_utc": 1705352400,
+            "permalink": "/r/technology/comments/a1b2c3/x/c009/",
+            "score": 8,
+            "replies": ""
+          }
+        },
+        {
+          "kind": "t1",
+          "data": {
+            "id": "c010",
+            "name": "t1_c010",
+            "subreddit": "technology",
+            "parent_id": "t3_a1b2c3",
+            "link_id": "t3_a1b2c3",
+            "body": "This.",
+            "author": "terse_poster",
+            "created_utc": 1705356000,
+            "permalink": "/r/technology/comments/a1b2c3/x/c010/",
+            "score": 41,
+            "replies": ""
+          }
+        },
+        {
+          "kind": "t1",
+          "data": {
+            "id": "c011",
+            "name": "t1_c011",
+            "subreddit": "technology",
+            "parent_id": "t3_a1b2c3",
+            "link_id": "t3_a1b2c3",
+            "body": "Это предложение сильно ударит по небольшим компаниям, потому что независимый аудит стоит очень дорого и никто не захочет его оплачивать.",
+            "author": "intl_reader",
+            "created_utc": 1705359600,
+            "permalink": "/r/technology/comments/a1b2c3/x/c011/",
+            "score": 6,
+            "replies": ""
+          }
+        },
+        {
+          "kind": "t1",
+          "data": {
+            "id": "c012",
+            "name": "t1_c012",
+            "subreddit": "technology",
+            "parent_id": "t3_a1b2c3",
+            "link_id": "t3_a1b2c3",
+            "body": "**The real question** is who pays for the audit.\n\n> Voluntary commitments have no enforcement mechanism.\n\n```\naudit_cost = time * specialists\n```\n\nSee u/legalthrowaway's [write-up](https://example.com/writeup) for the details, and r/legaladvice for the counterargument.",
+            "author": "markdown_user",
+            "created_utc": 1705363200,
+            "permalink": "/r/technology/comments/a1b2c3/x/c012/",
+            "score": 77,
+            "replies": ""
+          }
+        },
+        {
+          "kind": "t1",
+          "data": {
+            "id": "c013",
+            "name": "t1_c013",
+            "subreddit": "technology",
+            "parent_id": "t3_a1b2c3",
+            "link_id": "t3_a1b2c3",
+            "body": "it is what it is and that is that for you and me",
+            "author": "filler_account",
+            "created_utc": 1705366800,
+            "permalink": "/r/technology/comments/a1b2c3/x/c013/",
+            "score": 5,
+            "replies": ""
+          }
+        },
+        {
+          "kind": "t1",
+          "data": {
+            "id": "c014",
+            "name": "t1_c014",
+            "subreddit": "technology",
+            "parent_id": "t1_zzzzzz",
+            "link_id": "t3_a1b2c3",
+            "body": "Replying to a comment that was itself deleted, so this one arrives without its parent in the payload.",
+            "author": "orphan_replier",
+            "created_utc": 1705370400,
+            "permalink": "/r/technology/comments/a1b2c3/x/c014/",
+            "score": 9,
+            "replies": ""
+          }
+        },
+        {
+          "kind": "t1",
+          "data": {
+            "id": "c015",
+            "name": "t1_c015",
+            "subreddit": "technology",
+            "parent_id": "t3_a1b2c3",
+            "link_id": "t3_a1b2c3",
+            "body": "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥",
+            "author": "emoji_only",
+            "created_utc": 1705374000,
+            "permalink": "/r/technology/comments/a1b2c3/x/c015/",
+            "score": 15,
+            "replies": ""
+          }
+        },
+        {
+          "kind": "t1",
+          "data": {
+            "id": "c016",
+            "name": "t1_c016",
+            "subreddit": "technology",
+            "parent_id": "t3_a1b2c3",
+            "link_id": "t3_a1b2c3",
+            "author": "missing_body",
+            "created_utc": 1705377600,
+            "permalink": "/r/technology/comments/a1b2c3/x/c016/",
+            "score": 0,
+            "replies": ""
+          }
+        }
+      ]
+    }
+  }
+]

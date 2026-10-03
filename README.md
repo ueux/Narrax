@@ -21,8 +21,8 @@ finally evidence-grounded narratives and their evolution over time.
 |-------|-------|--------|
 | 0 | Repository scaffold (layout, DB, API shell) | ✅ done |
 | 0.5 | Product requirements, architecture + ADRs, repo structure, engineering foundation | ✅ done |
-| 0.6 | Database schema: 18 tables, migrations, indexes, database tests | ✅ current |
-| 1 | Reddit ingestion + storage (PostgreSQL + pgvector) | ⬜ planned |
+| 0.6 | Database schema: 18 tables, migrations, indexes, database tests | ✅ done |
+| 1 | Reddit ingestion: source adapter, normalization, text cleaning, dataset inspection | ✅ current |
 | 2 | Embeddings + semantic clustering (HDBSCAN) | ⬜ planned |
 | 3 | Sentiment + stance classification | ⬜ planned |
 | 4 | Narrative extraction (provider-independent LLM) | ⬜ planned |
@@ -44,10 +44,11 @@ Narrax/
 ├── backend/                 # Python + FastAPI service
 │   ├── app/
 │   │   ├── api/             #   HTTP edge: routes, dependencies, router
+│   │   ├── cli/             #   terminal edge: commands that call services
 │   │   ├── config/          #   settings + logging (leaf package)
 │   │   ├── database/        #   engine, session, ORM models
-│   │   ├── ingestion/       #   Layer 1 — acquire source truth        (Phase 1)
-│   │   ├── intelligence/    #   Layers 2–4 — embeddings → narratives  (Phases 2–6)
+│   │   ├── ingestion/       #   Layer 1 — acquire + normalize + clean  (Phase 1)
+│   │   ├── intelligence/    #   Layers 2–4 — embeddings → narratives   (Phases 2–6)
 │   │   ├── schemas/         #   API request/response DTOs
 │   │   └── services/        #   orchestration / use-cases
 │   ├── alembic/             #   schema migrations
@@ -150,6 +151,22 @@ pytest tests/database -v
 
 With neither available those tests **skip with an explanatory message** rather than failing.
 
+### Collecting a dataset
+
+Live collection needs Reddit OAuth credentials (`REDDIT_CLIENT_ID`, `REDDIT_CLIENT_SECRET`,
+`REDDIT_USER_AGENT`). Offline, the committed corpus can be replayed through the real pipeline:
+
+```bash
+cd backend
+alembic upgrade head
+python -m app.cli.ingest_recorded --input-dir tests/fixtures/reddit \
+  --topic "AI regulation" --communities technology programming --limit 50
+python -m app.cli.inspect_dataset --output ../docs/reports/sample-dataset-report.md
+```
+
+Collection is idempotent: re-running reports `0 new, 26 refreshed` and changes no authored text.
+See [ingestion.md](docs/ingestion.md) for the pipeline and its known limitations.
+
 ---
 
 ## Documentation
@@ -166,6 +183,8 @@ With neither available those tests **skip with an explanatory message** rather t
 - [Architecture](docs/architecture.md) — system, components, flows, boundaries, deployment
 - [Data flow](docs/data-flow.md) — every stage, its inputs/outputs, idempotency, provenance
 - [Database](docs/database.md) — ERD, table reference, review findings, index rationale
+- [Ingestion & normalization](docs/ingestion.md) — source adapter, normalized model, cleaning rules, dataset inspection
+- [Sample dataset report](docs/reports/sample-dataset-report.md) — what the recorded corpus actually contains
 - [ADRs](docs/adr/README.md) — why the architecture is the way it is
 
 **Principles**

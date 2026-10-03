@@ -46,7 +46,11 @@ from app.database.models.mixins import CreatedAtMixin, TimestampMixin, UUIDPrima
 
 
 class DiscussionAnalysis(UUIDPrimaryKeyMixin, TimestampMixin, Base):
-    """A discussion's analysis record within one run (and the run's corpus membership)."""
+    """A discussion's analysis record within one run (and the run's corpus membership).
+
+    Language is deliberately *not* stored here: it is a property of the text rather than of a run,
+    so it is computed once and lives on `text_preparation`.
+    """
 
     __tablename__ = "discussion_analysis"
 
@@ -56,9 +60,6 @@ class DiscussionAnalysis(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     discussion_id: Mapped[UUID] = mapped_column(
         ForeignKey("discussions.id", ondelete="CASCADE"), nullable=False
     )
-
-    # Detected language of the analysed text (English-only MVP, but recorded per item).
-    language: Mapped[str | None] = mapped_column(Text)
 
     sentiment_label: Mapped[str | None] = mapped_column(Text)
     # Polarity in [-1, 1]: -1 most negative, +1 most positive.

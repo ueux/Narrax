@@ -30,10 +30,11 @@ enforced by review — see [architecture.md §7](../docs/architecture.md#7-modul
 ```text
 app/
 ├── api/           # HTTP edge: routes, shared dependencies, router aggregation
+├── cli/           # terminal edge: argument parsing + a session, then a service call
 ├── config/        # settings + logging — a leaf, imported by everything
 ├── database/      # engine, session, ORM models
-├── ingestion/     # Layer 1: acquire + normalise source truth          (Phase 1)
-├── intelligence/  # Layers 2–4: embeddings → narratives → evolution    (Phases 2–6)
+├── ingestion/     # Layer 1: acquire + normalize + clean source truth    (Phase 1)
+├── intelligence/  # Layers 2–4: embeddings → narratives → evolution      (Phases 2–6)
 ├── schemas/       # Pydantic DTOs for the HTTP boundary
 ├── services/      # orchestration / use-cases; the only whole-workflow layer
 └── main.py        # composition: config → logging → routers
@@ -41,10 +42,11 @@ app/
 
 Rules of thumb:
 
-- `api/` holds no analysis logic and opens no sessions of its own.
+- `api/` and `cli/` hold no analysis logic and open no sessions of their own.
 - `services/` is the only package that composes ingestion + intelligence + database.
-- Nothing imports `api/`; `config/` imports nothing from `app.*`.
-- Only `ingestion/` writes Layer 1 (source truth).
+- Nothing imports `api/` or `cli/`; `config/` imports nothing from `app.*`.
+- Only `ingestion/` writes Layer 1 (source truth), and platform-specific field names never escape
+  `ingestion/<platform>/` — see [docs/ingestion.md](../docs/ingestion.md).
 
 ## Checks
 
@@ -59,7 +61,7 @@ Or run every gate at once from the repository root: `pwsh -File scripts/check.ps
 
 ## Database
 
-The schema (18 tables across four epistemic layers), its review findings, and the rationale for
+The schema (19 tables across four epistemic layers), its review findings, and the rationale for
 every index are documented in [docs/database.md](../docs/database.md).
 
 ```bash
@@ -70,6 +72,22 @@ pytest tests/database -v
 
 Alternatively set `NARRAX_TEST_DATABASE_URL` to point at any PostgreSQL with the `vector`
 extension. If neither is available the database tests skip with an explanatory message.
+
+## Collecting a dataset
+
+Live collection requires Reddit OAuth credentials (`REDDIT_CLIENT_ID`, `REDDIT_CLIENT_SECRET`,
+`REDDIT_USER_AGENT` in `.env`). Offline, recorded payloads replay through the same pipeline:
+
+```bash
+alembic upgrade head
+python -m app.cli.ingest_recorded --input-dir tests/fixtures/reddit \
+  --topic "AI regulation" --communities technology programming --limit 50
+python -m app.cli.inspect_dataset --top-communities 10
+```
+
+Collection is idempotent: a second run reports `0 new, 26 refreshed` and rewrites no authored text.
+The pipeline, its cleaning rules, and its known limitations are in
+[docs/ingestion.md](../docs/ingestion.md).
 
 ## Tests
 
